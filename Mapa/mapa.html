@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Move Marker Along Line</title>
+
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js"></script>
+
+<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+
+<style>
+  body { margin:0 auto; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:70%; height: 60%; border: solid}
+</style>
+</head>
+<body>
+
+<div id='images' style='float: right; width: 49%;'></div>
+<div id='map'></div>
+
+<script>
+
+var pnt_partida = [19.458060, -99.108239];
+var arr_lineas_x = [];
+var arr_lineas_y = [];
+
+var coord_hnd = [15.032590, -86.381172];
+var coord_gua = [15.340067, -90.687813];
+var coord_sal = [13.574164, -88.611397];
+
+var txt_hnd = "";
+var txt_gua = "";
+var txt_sal = "";
+
+var col_hnd = 8;
+var col_sal = 9;
+var col_gua = 10;
+var col_h = 2;
+var col_m = 3;
+var col_tot = 4;
+var col_m_det = 6;
+var col_h_det = 5;
+var col_tot_det = 7;
+
+var markerBoy1;
+var markerBoy2;
+var markerBoy3;
+
+var myBoy = L.icon({
+	iconUrl: 'images/boy1.png',
+	iconSize: [30, 45],
+	iconAnchor: [30, 45],
+	popupAnchor: [-3, -76],
+	shadowSize: [68, 95],
+	shadowAnchor: [22, 94]
+});
+var myBoy2 = L.icon({
+	iconUrl: 'images/boy2.png',
+	iconSize: [30, 45],
+	iconAnchor: [30, 45],
+	popupAnchor: [-3, -76],
+	shadowSize: [68, 95],
+	shadowAnchor: [22, 94]
+});
+var myBoy3 = L.icon({
+	iconUrl: 'images/boy3.png',
+	iconSize: [30, 45],
+	iconAnchor: [30, 45],
+	popupAnchor: [-3, -76],
+	shadowSize: [68, 95],
+	shadowAnchor: [22, 94]
+});
+
+var texto_policia="";
+
+function insertar_paises(coordenadas,titulo,texto){
+	return L.mapbox.featureLayer( {
+		type: 'Feature',
+		geometry: {
+			type: 'Point',
+			coordinates: [coordenadas[1],coordenadas[0]]
+		},
+		properties: {
+			title: titulo,
+			description: texto,
+			'marker-size': 'small',
+			'marker-color': '#000'
+		}
+	});
+}
+/*
+function obtener_archivo(archivo){
+
+	var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", 'pru.txt', true);
+    rawFile.onreadystatechange = function ()
+    {
+	alert("paso 1");
+        if(rawFile.readyState === 4)
+        {
+		alert("paso 2");
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+			alert("paso 3");
+                var allText = rawFile.responseText;
+                alert(allText);
+            }
+        }
+    }
+    rawFile.send();*/
+	/*var txtFile = new XMLHttpRequest();
+    txtFile.onreadystatechange = function() {
+      if (txtFile.readyState==4 && txtFile.status==200) {
+		alert('UJU');
+          allText = txtFile.responseText;
+          //lines = txtFile.responseText.split("\n"); // Will separate each line into an array
+          alert(allText);
+        
+      }
+    }
+	txtFile.open("GET", "pru.txt", true);
+	txtFile.send();*/
+//	alert("1");
+   /* $.get("pru.txt",function(data,status){
+		alert("Data: " + data + "\nStatus: " + status);
+	});*/
+	 /*alert("2");
+}*/
+
+function leer_documento(documento){
+	//var fff = fopen(getScriptPath('datos.csv'),0);
+	//alert(flength(fff));
+	/*var fr = new FileReader();
+	var titulos_num = 0;
+	var crd;
+	var pol;
+	alert('aqui');*/
+	//alert('done:'+fr);
+	
+	/*alert('done');
+	fr.onload = function(event){
+		
+		var csv = event.target.result;
+		var data = $.csv.toArrays(csv);
+		for(var row in data){
+			if(titulos_num==0){
+				titulos_num++;
+				continue;
+			}
+			crd = obtener_coord(col_sal,data[row][col_h],data[row][col_m],data[row][col_sal]);
+			pol = ninos_deport(obtener_color(data[row][col_sal]),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+			crd = obtener_coord(col_hnd,data[row][col_h],data[row][col_m],data[row][col_hnd]);
+			pol = ninos_deport(obtener_color(data[row][col_hnd]),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+			crd = obtener_coord(col_gua,data[row][col_h],data[row][col_m],data[row][col_gua]);
+			pol = ninos_deport(obtener_color(data[row][col_gua]),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+		}
+	};
+	fr.readAsText(documento);
+*/
+		texto_policia = obtener_texto_det(5256,14897,20153);
+
+			crd = obtener_coord(col_sal,3683);
+			pol = ninos_deport(obtener_color(3683),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+			insertar_ninos(col_sal,3683);
+			crd = obtener_coord(col_hnd,7044);
+			pol = ninos_deport(obtener_color(7044),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+			insertar_ninos(col_hnd,7044);
+			crd = obtener_coord(col_gua,5941);
+			pol = ninos_deport(obtener_color(5941),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+			pol.addTo(map);
+			insertar_ninos(col_gua,5941);
+
+//alert('ddd');
+}
+
+function insertar_ninos(col,total){
+	var icono_temp = myBoy;
+	if(total>4000){
+		icono_temp = myBoy3;
+	}
+	else if(total>1000){
+		icono_temp = myBoy2;
+	}
+	if(col==col_hnd){
+		markerBoy1 = L.marker([19.458060, -99.108239], {icon: icono_temp});
+	}else if(col==col_gua){
+		markerBoy2 = L.marker([19.458060, -99.108239], {icon: icono_temp});
+	}else if(col==col_sal){
+		markerBoy3 = L.marker([19.458060, -99.108239], {icon: icono_temp});
+	}
+}
+
+function obtener_coord(pais,tot_dep){
+	var texto_temp = /*"<h3>Ni&ntilde;as: <i>"+td_m+"</i></h3>"+
+					 "<h3>Ni&ntilde;os: <i>"+td_h+"</i></h3><hr/>"+*/
+				     "<hr/><div align='center'><h3>Total Deportados: <i>"+tot_dep+"</i> Ni&ntilde;os</h3>"+
+					 "entre 2011 y 2013.</div>";
+	if(pais==col_hnd){
+		txt_hnd = texto_temp;
+		return coord_hnd;
+	}
+	//else if(pais.search("Salvador")>0){
+	else if(pais==col_sal){
+		txt_sal = texto_temp;
+		return coord_sal;
+	}
+	else if(pais==col_gua){
+		txt_gua = texto_temp;
+		return coord_gua;
+	}
+}
+
+function obtener_color(total){
+	if(total<1000){
+		return "#000fff";//azul
+	}
+	/*else if(total>=500&&total<1000){
+		return "#7a8ccb";
+	}
+	else if(total>=1000&&total<1500){
+		return "#6277c1";
+	}
+	else if(total>=1500&&total<2000){
+		return "#435aa9";
+	}
+	else if(total>=2000&&total<2500){
+		return "#374a8c";
+	}
+	else if(total>=2500&&total<3000){
+		return "#4a4084";
+	}
+	else if(total>=3000&&total<3500){
+		return "#362f62";
+	}*/
+	else if(total>=1000&&total<4000){
+		return "#3fd636";
+	}
+	else if(total>=4000){
+		return "#fff000";//amarillo
+	}
+}
+
+function ninos_deport(color_linea,lat_i,lng_i,lat_f,lng_f){
+	return L.polyline([L.latLng(lat_i, lng_i),L.latLng(lat_f, lng_f)], {color: color_linea}).addTo(map);
+}
+
+function agregar_lineas(){
+
+	/*var crd = obtener_coord("El Salvador",12,11,23);
+	var pol = ninos_deport(obtener_color(3500),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+	pol.addTo(map);*/
+	arr_lineas_x.push(15.340067);
+	arr_lineas_y.push(-90.687813);
+	
+	/*crd = obtener_coord("Deportados a Honduras",34,44,78);
+	pol = ninos_deport(obtener_color(9000),pnt_partida[0],pnt_partida[1], crd[0], crd[1]);
+	pol.addTo(map);*/
+	arr_lineas_x.push(15.032590);
+	arr_lineas_y.push(-86.381172);
+	
+	arr_lineas_x.push(13.574164);
+	arr_lineas_y.push(-88.611397);
+	
+}
+
+function animacion(elemento,pos_linea){
+	var t = 0;
+	var y_t = pnt_partida[1];
+	var x_t = pnt_partida[0];
+	
+	var div_x = (arr_lineas_x[pos_linea] - pnt_partida[0])/100;
+	var div_y = (arr_lineas_y[pos_linea] - pnt_partida[1])/100;
+	var cont = 0;
+	window.setInterval(function() {
+		elemento.setLatLng(L.latLng(x_t,y_t));
+		x_t = x_t + div_x;
+		y_t = y_t + div_y;
+		cont++;
+		if(cont==100){
+			y_t = pnt_partida[1];
+			x_t = pnt_partida[0];
+			cont = 0;
+		}
+	}, 50);
+}
+
+function obtener_texto_det(td_m,td_h,total){
+	return "<div align='center'>DETENCIONES"+
+		   "<h3>Ni&ntilde;as: <i>"+td_m+"</i></h3>"+
+		   "<h3>Ni&ntilde;os: <i>"+td_h+"</i></h3>"+
+		   "<hr/><h3>Total Detenidos: <i>"+total+"</i> Ni&ntilde;os</h3>"+
+		   "entre 2011 y 2013.</div>";
+}
+/*var ui = document.getElementById('map-ui');
+for(i = 2011;i<=2013;i++){
+	var itemLi = document.createElement('li');
+	var itemDiv = document.createElement('div');
+	itemDiv.id = 'id'+i;
+	itemDiv.innerHTML = i;
+	itemDiv.onclick = function(e) {
+		//cargar_mapa(1);
+		map.remove();
+		map = L.mapbox.map('map', 'examples.map-20v6611k').setView([20, -95], 4);
+		leer_documento("nada");
+		extra.addTo(map);
+//);*/
+	
+	/*animacion(markerBoy1,0);
+	animacion(markerBoy2,1);
+	animacion(markerBoy3,2);
+
+	markerBoy1.addTo(map);
+	markerBoy2.addTo(map);
+	markerBoy3.addTo(map)
+
+	var marcador1 = insertar_paises(coord_hnd,"<h1>HONDURAS</h1>",txt_hnd);
+	var marcador2 = insertar_paises(coord_gua,"<h1>GUATEMALA</h1>",txt_gua);
+	var marcador3 = insertar_paises(coord_sal,"<h1>EL SALVADOR</h1>",txt_sal);
+	
+	marcador1.addTo(map);
+	marcador2.addTo(map);
+	marcador3.addTo(map);*/
+	//};
+	//itemLi.appendChild(itemDiv);
+    //ui.appendChild(itemLi);
+//}
+
+//cargar_mapa();
+
+var map = L.mapbox.map('map', 'ssauron00.hn9kmg1a').setView([20, -95], 5);
+	//obtener_archivo();
+	//alert('dos');
+	agregar_lineas();
+	leer_documento('o');
+	
+
+var mark01 = L.mapbox.featureLayer({
+		// this feature is in the GeoJSON format: see geojson.org
+		// for the full specification
+		type: 'Feature',
+		geometry: {
+			type: 'Point',
+			// coordinates here are in longitude, latitude order because
+			// x, y is the standard for GeoJSON and many formats
+			coordinates: [19.458060, -99.108239]
+		},
+		properties: {
+			title: 'A Single Marker',
+			description: 'Just one of me',
+			// one can customize markers by adding simplestyle properties
+			// http://mapbox.com/developers/simplestyle/
+			'marker-size': 'medium',
+			'marker-color': '#0f0'
+		}
+	});
+	
+	var mark02 = L.mapbox.featureLayer({
+		type: 'Feature',
+		geometry: {
+			type: 'Point',
+			coordinates: [-80, 50.9]
+		},
+		properties: {
+			title: 'A Single Marker',
+			description: 'Just one of me',
+			'marker-size': 'medium',
+			'marker-color': '#00f'
+		}
+	});
+	/*
+	var marker = L.marker([0, 0], {
+		icon: L.mapbox.marker.icon({
+			type: 'Feature',
+			geometry: {
+				type: 'Point',
+				coordinates: [-77, 37.9]
+			},
+			properties: { }
+		})
+	});
+	*/
+	var marker11 = L.marker([0, 0], {
+		icon: L.mapbox.marker.icon({
+			type: 'Feature',
+			geometry: {
+				type: 'Point',
+				coordinates: [-77, 37.9]
+			},
+			properties: { }
+		})
+	});
+	
+	var marker22 = L.marker([0, 0], {
+		icon: L.mapbox.marker.icon({
+			type: 'Feature',
+			geometry: {
+				type: 'Point',
+				coordinates: [-77, 37.9]
+			},
+			properties: { }
+		})
+	});
+	
+	var myIcon = L.icon({
+		iconUrl: 'images/icon_19307.png',
+		iconSize: [85, 85],
+		iconAnchor: [22, 94],
+		popupAnchor: [-3, -76],
+		shadowSize: [68, 95],
+		shadowAnchor: [22, 94]
+	});
+	
+	var extra = L.marker([19, -99.108239], {title: "Detenciones",icon: myIcon}).addTo(map);
+	
+	var imageUrl = 'images/icon_23495.png',
+	imageBounds = [[14.340067, -89.687813], [16.340067, -91.687813]];  //15.032590, -86.381172
+	
+	
+	/*
+	
+	15.340067);
+	arr_lineas_y.push(-90.687813
+	arr_lineas_x.push(15.032590);
+	arr_lineas_y.push(-86.381172);
+	
+	arr_lineas_x.push(13.574164);
+	arr_lineas_y.push(-88.611397);
+	*/
+
+	var imgOver = L.imageOverlay(imageUrl, imageBounds);//.addTo(map);
+	
+	var imageUrl2 = 'images/icon_23495.png',
+	imageBounds2 = [[14.032590, -85.381172], [16.032590, -87.381172]];  
+
+	var imgOver2 = L.imageOverlay(imageUrl2, imageBounds2);//.addTo(map);
+	
+	var imageUrl3 = 'images/icon_23495.png',
+	imageBounds3 = [[12.574164, -87.611397], [14.574164, -89.611397]];  //15.032590, -86.381172
+
+	var imgOver3 = L.imageOverlay(imageUrl3, imageBounds3);//.addTo(map);
+	
+	
+	
+	/*
+	var img = document.createElement('img');
+    var dimensions = map.getSize();
+    img.width = dimensions.x;
+    img.height = dimensions.y;
+    img.src = "botonE.jpg";
+    document.getElementById('images').innerHTML = '';
+    document.getElementById('images').appendChild(img);
+	*/
+//	markerBoy1 = L.marker([19.458060, -99.108239], {icon: myBoy});
+//	markerBoy2 = L.marker([19.458060, -99.108239], {icon: myBoy});
+//	markerBoy3 = L.marker([19.458060, -99.108239], {icon: myBoy});
+	
+/*
+function cargar_mapa(){
+leer_documento('o');
+}*/
+
+//function cargar_mapa(){
+
+	
+	
+	
+	//marker11 = L.marker([19.458060, -99.108239], {icon: myIcon}).addTo(map);
+	extra.addTo(map);
+//);
+	
+	animacion(markerBoy1,0);
+	animacion(markerBoy2,1);
+	animacion(markerBoy3,2);
+
+	markerBoy1.addTo(map);
+	markerBoy2.addTo(map);
+	markerBoy3.addTo(map)
+
+	var marcador1 = insertar_paises(coord_hnd,"<div align='center'><h1>HONDURAS</h1></div>",txt_hnd);
+	var marcador2 = insertar_paises(coord_gua,"<div align='center'><h1>GUATEMALA</h1></div>",txt_gua);
+	var marcador3 = insertar_paises(coord_sal,"<div align='center'><h1>EL SALVADOR</h1></div>",txt_sal);
+	
+	marcador1.addTo(map);
+	marcador2.addTo(map);
+	marcador3.addTo(map);
+	
+	imgOver.bringToFront();
+	imgOver.addTo(map);
+	
+	imgOver2.bringToFront();
+	imgOver2.addTo(map);
+	
+	imgOver3.bringToFront();
+	imgOver3.addTo(map);
+//}
+	
+//obtener_archivo("pru.txt");
+
+
+
+
+</script>
+</body>
+</html>
